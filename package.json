@@ -2,5 +2,9 @@
   "name": "home-royale",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" }
+  "engines": { "node": ">=22.21" },
+  "scripts": {
+    "check": "NODE_USE_ENV_PROXY=1 node --no-warnings scripts/check-access.js",
+    "check:amazon": "NODE_USE_ENV_PROXY=1 node --no-warnings scripts/check-amazon.js"
+  }
 }

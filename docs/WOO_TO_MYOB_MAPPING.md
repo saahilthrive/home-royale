@@ -30,3 +30,9 @@ Cancelled and refunded Woo orders are mostly not in MYOB (53 of 56 cancelled, 18
 ## Amounts
 Woo prices include GST; MYOB unit prices are ex-GST to 4 decimals. Of 370 orders compared line by line,
 220 totals match to the cent and most of the rest differ by 1-2 cents (rounding).
+
+## API access (WooCommerce REST)
+SiteGround's Anti-Bot captcha blocks the API unless the caller's IP is allowlisted. SiteGround has allowlisted
+`160.79.106.0/24` (the Claude cloud session egress range) for testing; replace it with the Azure static
+outbound IP when the pipeline moves. Node's built-in `fetch` ignores `HTTPS_PROXY` and leaves from a
+different, non-allowlisted IP, so run scripts with `NODE_USE_ENV_PROXY=1` (the `npm run` scripts do this).
