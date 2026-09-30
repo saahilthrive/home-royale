@@ -1,2 +1,5 @@
 .env
 node_modules/
+amazon-push-log.json
+amazon-sales-report.json
+*.csv

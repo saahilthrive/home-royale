@@ -1,4 +1,4 @@
-// Amazon Selling Partner API client for a private vendor app: read-only calls only for now.
+// Amazon Selling Partner API client for a private vendor app. The only POST in use requests reports.
 // Plain Node 22, no dependencies. Config: AMZ_CLIENT_ID, AMZ_CLIENT_SECRET, AMZ_REFRESH_TOKEN,
 // AMZ_ENDPOINT (default: Far East, which serves Amazon.com.au).
 
@@ -37,22 +37,26 @@ export class Amazon {
     return this.token.value;
   }
 
-  /** GET a path, retrying on 429 (rate limit) with backoff. */
-  async get(path, params = {}) {
+  async get(path, params = {}) { return this.request('GET', path, params); }
+
+  /** Call a path, retrying on 429 (rate limit) with backoff. */
+  async request(method, path, params = {}, body) {
     const url = new URL(this.cfg.ENDPOINT + path);
     for (const [k, v] of Object.entries(params)) {
       if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v));
     }
     for (let attempt = 0; ; attempt++) {
       const res = await fetch(url, {
-        headers: { 'x-amz-access-token': await this.#accessToken(), Accept: 'application/json' },
+        method,
+        headers: { 'x-amz-access-token': await this.#accessToken(), Accept: 'application/json', ...(body && { 'Content-Type': 'application/json' }) },
+        ...(body && { body: JSON.stringify(body) }),
       });
       if (res.status === 429 && attempt < 5) {
         await new Promise(r => setTimeout(r, 2000 * 2 ** attempt));
         continue;
       }
       const text = await res.text();
-      if (!res.ok) throw new Error(`GET ${url.pathname} failed (${res.status}): ${text.slice(0, 1000)}`);
+      if (!res.ok) throw new Error(`${method} ${url.pathname} failed (${res.status}): ${text.slice(0, 1000)}`);
       return JSON.parse(text);
     }
   }
