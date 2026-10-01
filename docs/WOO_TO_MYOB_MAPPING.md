@@ -28,8 +28,17 @@ Cancelled and refunded Woo orders are mostly not in MYOB (53 of 56 cancelled, 18
 | Coupon / discount | non-stock `DSCNT1` "Discount 1" | |
 
 ## Amounts
-Woo prices include GST; MYOB unit prices are ex-GST to 4 decimals. Of 370 orders compared line by line,
+Correction (2026-10-01, from the REST API): every order since 2025-01 has `prices_include_tax: false`. Line
+`total` is **ex-GST**, `total_tax` is separate, and `price` is the unrounded ex-GST unit price (e.g. 72.682). For 20
+of 20 orders sampled, sum of line totals + tax + shipping = order total. Use `price` as MYOB `UnitPrice`. MYOB unit
+prices are ex-GST to 4 decimals. Of 370 orders compared line by line,
 220 totals match to the cent and most of the rest differ by 1-2 cents (rounding).
+
+## Re-running the reconciliation
+`npm run reconcile -- homeroyale [--since 2025-01-01]` (read-only, aggregates only). On 2026-10-01 it reproduced the
+figures above: 80% of lines exact, 17% after stripping `+`, 98% of mapped lines found on the MYOB order, and the
+2026-02 cutoff. It also found 4,788 `failed` Woo orders in 2025-08, probably a card-testing attack. Exclude
+`failed` orders from the pipeline.
 
 ## API access (WooCommerce REST)
 SiteGround's Anti-Bot captcha blocks the API unless the caller's IP is allowlisted. SiteGround has allowlisted

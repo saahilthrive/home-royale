@@ -1,12 +1,12 @@
 // WooCommerce REST API (v3) client: read-only. Plain Node 22, no dependencies.
-// Config: WC_BASE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET (read-only key from
-// WooCommerce > Settings > Advanced > REST API).
+// Config: {prefix}BASE_URL, {prefix}CONSUMER_KEY, {prefix}CONSUMER_SECRET (read-only key from
+// WooCommerce > Settings > Advanced > REST API). The prefix is WC_ for the first store; see src/stores.js.
 
-function config() {
+export function config(prefix = 'WC_') {
   const cfg = {};
   for (const k of ['BASE_URL', 'CONSUMER_KEY', 'CONSUMER_SECRET']) {
-    const v = process.env['WC_' + k];
-    if (!v) throw new Error(`Missing env var WC_${k}`);
+    const v = process.env[prefix + k];
+    if (!v) throw new Error(`Missing env var ${prefix}${k}`);
     cfg[k] = v.trim();
   }
   cfg.BASE_URL = cfg.BASE_URL.replace(/\/+$/, '');
@@ -30,8 +30,18 @@ export class Woo {
   /** GET one page; returns { data, total, totalPages }. */
   async page(path, params = {}) {
     const url = this.url(path, params);
-    const res = await fetch(url, { headers: { Authorization: this.auth, Accept: 'application/json' } });
-    const text = await res.text();
+    let res, text;
+    for (let attempt = 0; ; attempt++) {
+      res = await fetch(url, { headers: { Authorization: this.auth, Accept: 'application/json' } });
+      text = await res.text();
+      // SiteGround's Anti-Bot answers with an HTML redirect to /.well-known/sgcaptcha/ when the IP isn't allowlisted.
+      // Order JSON can itself contain the string "sgcaptcha", so only treat an HTML body as the captcha. Retry a few
+      // times in case a request left from an IP outside the allowlist (reads only).
+      if (!(/^\s*</.test(text) && text.includes('sgcaptcha'))) break;
+      const ip = /y=ip.:([\d.]+)/.exec(text)?.[1];
+      if (attempt >= 4) throw new Error(`GET ${url.pathname} blocked by SiteGround captcha (seen from ${ip}): allowlist this IP for ${url.host}`);
+      await new Promise(r => setTimeout(r, 1000 * 2 ** attempt));
+    }
     if (!res.ok) throw new Error(`GET ${url.pathname} failed (${res.status}): ${text.slice(0, 500)}`);
     return {
       data: JSON.parse(text),
