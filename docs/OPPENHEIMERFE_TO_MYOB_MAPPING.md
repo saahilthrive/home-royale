@@ -12,7 +12,7 @@ statement that the order series below belongs to this store is an inference from
 | Check | Result |
 |---|---|
 | Woo REST API from this environment | **Blocked.** Every request, including `/wp-json/`, `robots.txt` and the homepage, gets SiteGround's Anti-Bot captcha (redirect to `/.well-known/sgcaptcha/`). Same block homeroyale.com.au had. |
-| Woo credentials | `WC2_BASE_URL`, `WC2_CONSUMER_KEY`, `WC2_CONSUMER_SECRET` are **not set** in the environment yet. |
+| Woo credentials | `WC2_*` secrets set (2026-10-01). Still captcha-blocked from `160.79.106.131`, so the allowlist isn't applied to this site yet. |
 | MYOB | OK: 1,070 customers, 4,717 stock items visible. |
 
 To unblock:
