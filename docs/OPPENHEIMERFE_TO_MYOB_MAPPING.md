@@ -98,25 +98,4 @@ price (`prices_include_tax: false`). That is verified on Home Royale; check that
   leave splitting to MYOB.
 
 ## Questions for the finance team
-1. **Customer mapping:** how does a Woo trade account map to a MYOB customer today? Is there an account number, ABN
-   or customer code on the Woo account, or do staff match by company name or email? Who maintains the mapping when a
-   new trade customer signs up?
-2. **Non-account buyers:** `ENWWW2` hasn't been used since 2025-05. Does the store still take retail or guest orders?
-   If so, which customer should they go on: `ENWWW2`, or a new one?
-3. **Unknown buyer:** if a Woo buyer can't be matched to a MYOB account, should the pipeline hold the order for
-   review, put it on a catch-all customer, or create a new customer?
-4. **Price:** should the SO carry the Woo price, or should MYOB apply the customer's own price class or contract
-   price? If they differ, which wins?
-5. **Credit:** do web orders from customers on credit hold or COD still go in? Should they be created On Hold?
-6. **Payment:** are trade web orders paid at checkout (card) or put on account terms? If paid by card, how is the
-   payment recorded in MYOB?
-7. **Freight:** is `FR-FS1` correct for all freight on this store? (`FR-FS` was used 3 times.) Is the $12.00 flat
-   rate still current?
-8. **Order reference:** is first name + order number still the convention? Should it use the company name instead
-   for trade accounts? Is `ExternalRef` or `UsrExternalOrderOriginal` preferred for the Woo order number?
-9. **Splits and returns:** when stock is short, do staff split the SO or back-order it? How are web returns raised
-   (CM or RC order)? Does finance want returns from the pipeline, or manual only?
-10. **Backfill:** should orders from 2026-02-03 onward be loaded, and should they go in as Completed history or as
-    open orders to be shipped?
-11. **Possible keying errors:** order numbers 65279, 67535 and 71471 are on two customers each, once on `ENWARR`.
-    Which is right?
+See `docs/QUESTIONS_FOR_TEAM.md` (section C), kept in one list with the Home Royale follow-ups.
